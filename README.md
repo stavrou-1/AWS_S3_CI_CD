@@ -2,6 +2,10 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.1.3.
 
+## To add cloudformation templates to your ENV - Ensure that the AWS cli is installed on your machine (recommended). If not you can use the AWS console (less recommended). Then:
+```bash
+aws cloudformation create-stack --stack-name UNIQUE_STACK_NAME --template-body file://CLOUD_FORMATION_TEMPLATE.yaml --capabilities CAPABILITY_IAM
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
