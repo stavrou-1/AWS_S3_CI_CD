@@ -1,10 +1,4 @@
-# TodoApp
-
-## To generate new stack
-
-```bash
-aws cloudformation create-stack --stack-name UNIQUE_STACK_NAME --template-body file://CLOUD_FORMATION_TEMPLATE.yaml --capabilities CAPABILITY_IAM
-```
+# App
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.1.3.
 

@@ -2,5 +2,5 @@ Resources:
   CodeCommitRepository:
     Type: AWS::CodeCommit::Repository
     Properties:
-      RepositoryName: MyStupidRepo1
-      RepositoryDescription: a description
+      RepositoryName: robot-repo
+      RepositoryDescription: Some test repository.

@@ -6,23 +6,11 @@ Parameters:
   RepositoryName:
     Description: CodeComit repository name
     Type: String
-    Default: MyStupidRepo1
+    Default: robot-repo
   ApplicationName:
-    Description: CodeDeploy application name
+    Description: Codebuild application name
     Type: String
-    Default: codedeployWizard-CodeDeployApplication-EW2SNYE2H5N1
-  ElasticBeanstalkName:
-    Description: ElasticBeanstalk application name
-    Type: String
-    Default: poopycloudformationelasticbeanstalkapp9-sampleApplication-VP19QLDL8PBK
-  ElasticBeanstalkEnv:
-    Description: "A decription of an elasticbeanstalk environment"
-    Type: String
-    Default: poop-samp-C2J12FGLP2HD
-  BetaFleet:
-    Description: Fleet configured in CodeDeploy
-    Type: String
-    Default: poopyCodeDeploymentGroup222-AppDeploymentGroup-MERVYTHEXOF5
+    Default: WHALEScodeBuildProject1
 Resources:
   CodePipelineArtifactStoreBucket:
     Type: 'AWS::S3::Bucket'
@@ -127,10 +115,13 @@ Resources:
   AppPipeline:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
-      Name: codecommit-events-pipeline1212
       RoleArn: !GetAtt 
         - CodePipelineServiceRole
         - Arn
+      ArtifactStore:
+        Type: S3
+        Location: robot-bucket1 ## CodePipelineArtifactStoreBucket
+      Name: robot-pipeline1
       Stages:
         - Name: Source
           Actions:
@@ -147,25 +138,22 @@ Resources:
                 RepositoryName: !Ref RepositoryName
                 PollForSourceChanges: false
               RunOrder: 1
-        - Name: Beta
+        - Name: Build
           Actions:
-            - Name: BetaAction
-              InputArtifacts:
-                - Name: SourceOutput
+            - Name: Build
               ActionTypeId:
-                Category: Deploy
+                Category: Build
                 Owner: AWS
                 Version: 1
-                Provider: ElasticBeanstalk
-              # OutputArtifacts:
-              #   - Name: SourceOutput
+                Provider: CodeBuild
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: DeployOutput
               Configuration:
-                ApplicationName: !Ref ElasticBeanstalkName
-                EnvironmentName: !Ref ElasticBeanstalkEnv
+                ProjectName: !Ref ApplicationName
+                PrimarySource: SourceAction
               RunOrder: 1
-      ArtifactStore:
-        Type: S3
-        Location: !Ref CodePipelineArtifactStoreBucket
   CodePipelineServiceRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -179,10 +167,14 @@ Resources:
             Action: 'sts:AssumeRole'
       Path: /
       Policies:
-        - PolicyName: AWS-CodePipeline-Service-3
+        - PolicyName: AWS-CodePipeline3-Service-3
           PolicyDocument:
             Version: 2012-10-17
             Statement:
+              - Effect: Allow
+                Action:
+                  - 'codepipeline:*'
+                Resource: '*'
               - Effect: Allow
                 Action:
                   - 'codecommit:CancelUploadArchive'
@@ -193,30 +185,8 @@ Resources:
                 Resource: '*'
               - Effect: Allow
                 Action:
-                  - 'codedeploy:CreateDeployment'
-                  - 'codedeploy:GetApplicationRevision'
-                  - 'codedeploy:GetDeployment'
-                  - 'codedeploy:GetDeploymentConfig'
-                  - 'codedeploy:RegisterApplicationRevision'
-              #   Resource: '*'
-              # - Effect: Allow
-              #   Action:
-              #     - 'codebuild:BatchGetBuilds'
-              #     - 'codebuild:StartBuild'
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - 'devicefarm:ListProjects'
-                  - 'devicefarm:ListDevicePools'
-                  - 'devicefarm:GetRun'
-                  - 'devicefarm:GetUpload'
-                  - 'devicefarm:CreateUpload'
-                  - 'devicefarm:ScheduleRun'
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - 'lambda:InvokeFunction'
-                  - 'lambda:ListFunctions'
+                  - 'codebuild:BatchGetBuilds'
+                  - 'codebuild:StartBuild'
                 Resource: '*'
               - Effect: Allow
                 Action:

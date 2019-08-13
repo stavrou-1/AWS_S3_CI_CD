@@ -1,16 +1,10 @@
-Parameters:
-  S3BucketName:
-    Description: S3 Bucket Name
-    Type: String
-    Default: stupids3bucket1
 AWSTemplateFormatVersion: 2010-09-09
-Description: My demo s3 bucket stack
+Description: My S3 CI/CD Pipeline Stack
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      AccessControl: PublicRead
-      BucketName: !Ref S3BucketName
+      BucketName: 'robot-bucket1'
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
@@ -20,13 +14,13 @@ Resources:
     Type: AWS::S3::BucketPolicy
     Properties:
       PolicyDocument:
-        Id: MyPolicy
+        Id: S3 CI/CD Pipeline Stack
         Version: 2012-10-17
         Statement:
-          - Sid: PublicReadForGetBucketObjects
+          - Sid: AllObjectActions
             Effect: Allow
             Principal: '*'
-            Action: 's3:GetObject'
+            Action: 's3:*Object'
             Resource: !Join 
               - ''
               - - 'arn:aws:s3:::'
@@ -34,19 +28,16 @@ Resources:
                 - /*
       Bucket: !Ref S3Bucket
 Outputs:
-  BucketName:
-    Value: !Ref S3BucketName
-    Description: Name of the stupid s3 bucket.
   WebsiteURL:
-    Value: !GetAtt 
+    Value: !GetAtt
       - S3Bucket
       - WebsiteURL
     Description: URL for website hosted on S3
   S3BucketSecureURL:
-    Value: !Join 
+    Value: !Join
       - ''
       - - 'https://'
-        - !GetAtt 
+        - !GetAtt
           - S3Bucket
           - DomainName
     Description: Name of S3 bucket to hold website content
